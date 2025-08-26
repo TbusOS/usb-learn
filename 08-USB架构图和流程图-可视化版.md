@@ -178,28 +178,24 @@ sequenceDiagram
 ### 2.2 设备状态机转换
 
 ```mermaid
-stateDiagram-v2
-    [*] --> Detached: 设备未连接
+flowchart TD
+    Start([设备未连接]) --> A[已连接]
+    A --> |Hub供电| B[已供电]
+    B --> |收到复位| C[默认状态<br/>地址=0]
+    C --> |SET_ADDRESS| D[已分配地址]
+    D --> |SET_CONFIG| E[已配置<br/>功能可用]
     
-    Detached --> Attached: 物理插入
-    Attached --> Powered: Hub供电
-    Powered --> Default: 收到复位信号<br/>地址=0，端点0可用
-    Default --> Address: SET_ADDRESS<br/>获得唯一地址
-    Address --> Configured: SET_CONFIGURATION<br/>完全功能可用
+    E --> |挂起3ms无SOF| F[挂起状态]
+    F --> |恢复信号| E
     
-    Configured --> Suspended: 挂起<br/>3ms无SOF
-    Suspended --> Configured: 恢复信号
+    E --> |USB复位| C
+    D --> |USB复位| C
+    F --> |USB复位| C
     
-    Configured --> Default: USB复位
-    Address --> Default: USB复位  
-    Default --> Detached: 断开连接
-    Suspended --> Detached: 断开连接
-    Configured --> Detached: 严重错误
-    
-    note right of Default: 默认状态：地址0，只有端点0可用
-    note right of Address: 地址状态：有唯一地址，可进行控制传输
-    note right of Configured: 配置状态：所有端点可用，功能完全启用
-    note right of Suspended: 挂起状态：低功耗模式，保持配置
+    C --> |断开| Start
+    D --> |严重错误| Start
+    E --> |断开| Start
+    F --> |断开| Start
 ```
 
 ## 3. USB数据传输流程
@@ -262,43 +258,44 @@ sequenceDiagram
 
 ### 3.2 批量传输流程
 
-```mermaid
-graph TD
-    subgraph "批量传输写操作流程"
-        A1[应用程序调用write] --> B1[驱动创建批量URB]
-        B1 --> C1[USB Core调度传输]
-        C1 --> D1[HCD处理URB队列]
-        
-        D1 --> E1[发送OUT令牌包]
-        E1 --> F1[发送数据包]
-        F1 --> G1[接收ACK确认]
-        
-        G1 --> H1{还有数据?}
-        H1 -->|是| E1
-        H1 -->|否| I1[URB完成]
-        
-        I1 --> J1[调用完成回调]
-        J1 --> K1[write()返回]
-    end
-    
-    subgraph "批量传输读操作流程"
-        A2[应用程序调用read] --> B2[驱动创建批量URB]
-        B2 --> C2[USB Core调度传输]
-        C2 --> D2[HCD处理URB队列]
-        
-        D2 --> E2[发送IN令牌包]
-        E2 --> F2[接收数据包]
-        F2 --> G2[发送ACK确认]
-        
-        G2 --> H2{需要更多数据?}
-        H2 -->|是| E2
-        H2 -->|否| I2[URB完成]
-        
-        I2 --> J2[调用完成回调]
-        J2 --> K2[read()返回]
-    end
-    
+#### 批量传输写操作（OUT）
 
+```mermaid
+flowchart TD
+    A1[应用程序调用write] --> B1[驱动创建批量URB]
+    B1 --> C1[USB Core调度传输]
+    C1 --> D1[HCD处理URB队列]
+    
+    D1 --> E1[发送OUT令牌包]
+    E1 --> F1[发送数据包]
+    F1 --> G1[接收ACK确认]
+    
+    G1 --> H1{还有数据?}
+    H1 -->|是| E1
+    H1 -->|否| I1[URB完成]
+    
+    I1 --> J1[调用完成回调]
+    J1 --> K1[write返回]
+```
+
+#### 批量传输读操作（IN）
+
+```mermaid
+flowchart TD
+    A2[应用程序调用read] --> B2[驱动创建批量URB]
+    B2 --> C2[USB Core调度传输]
+    C2 --> D2[HCD处理URB队列]
+    
+    D2 --> E2[发送IN令牌包]
+    E2 --> F2[接收数据包]
+    F2 --> G2[发送ACK确认]
+    
+    G2 --> H2{需要更多数据?}
+    H2 -->|是| E2
+    H2 -->|否| I2[URB完成]
+    
+    I2 --> J2[调用完成回调]
+    J2 --> K2[read返回]
 ```
 
 ### 3.3 中断传输调度示意
