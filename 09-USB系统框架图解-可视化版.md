@@ -1,4 +1,4 @@
-# USB系统框架图解（可视化版）
+bya# USB系统框架图解（可视化版）
 
 ## 🎯 概述
 
@@ -68,11 +68,7 @@ graph TB
     D3 --> E3
     D4 --> E4
     
-    %% 样式设置
-    style C1 fill:#e1f5fe
-    style C2 fill:#fff3e0
-    style C3 fill:#f3e5f5
-    style C4 fill:#e8f5e8
+
 ```
 
 **系统层次说明**：
@@ -147,10 +143,7 @@ graph TD
     D3 --> E3
     D4 --> E4
     
-    %% 样式
-    style C1 fill:#e1f5fe
-    style D1 fill:#fff3e0
-    style E2 fill:#f3e5f5
+
 ```
 
 **为什么选择XHCI**：
@@ -208,9 +201,7 @@ graph TD
     C4 --> D4
     
     %% 样式
-    style B1 fill:#e1f5fe
-    style C1 fill:#fff3e0
-    style D1 fill:#f3e5f5
+
 ```
 
 **设备端组件功能**：
@@ -352,7 +343,6 @@ sequenceDiagram
     participant Bus as USB总线
     participant Device as USB设备
     
-    rect rgb(240, 248, 255)
         Note over App,Device: Setup阶段 - 控制请求设置
         App->>Driver: 发起控制请求
         Driver->>Core: 创建控制URB
@@ -365,7 +355,6 @@ sequenceDiagram
         Bus->>HCD: 确认接收
     end
     
-    rect rgb(255, 248, 220)
         Note over App,Device: Data阶段 - 数据传输(可选)
         alt 需要数据传输
             Core->>HCD: 提交Data事务
@@ -387,7 +376,6 @@ sequenceDiagram
         end
     end
     
-    rect rgb(245, 255, 250)
         Note over App,Device: Status阶段 - 状态确认
         Core->>HCD: 提交Status事务
         alt Data阶段是OUT或无Data
@@ -418,54 +406,24 @@ sequenceDiagram
 
 ```mermaid
 stateDiagram-v2
-    [*] --> Detached: 设备未连接
+    [*] --> Detached
+    Detached --> Attached: 物理插入
+    Attached --> Powered: Hub供电
+    Powered --> Default: USB复位<br/>地址=0
+    Default --> Address: SET_ADDRESS<br/>获得地址
+    Address --> Configured: SET_CONFIG<br/>激活端点
+    Configured --> Suspended: 挂起<br/>3ms无SOF
+    Suspended --> Configured: 恢复信号
     
-    state "设备生命周期" as lifecycle {
-        Detached --> Attached: 物理连接检测
-        Attached --> Powered: Hub端口供电
-        Powered --> Default: USB复位信号<br/>地址=0，端点0
-        
-        state "地址分配" as addressing {
-            Default --> Address: SET_ADDRESS<br/>获得唯一地址
-        }
-        
-        state "设备配置" as configuration {
-            Address --> Configured: SET_CONFIGURATION<br/>激活所有端点
-        }
-        
-        state "电源管理" as power {
-            Configured --> Suspended: 挂起信号<br/>3ms无SOF
-            Suspended --> Configured: 恢复信号<br/>任何USB活动
-        }
-    }
+    Configured --> Default: USB复位
+    Address --> Default: USB复位
+    Suspended --> Default: USB复位
     
-    %% 错误恢复路径
-    Configured --> Default: USB总线复位
-    Address --> Default: USB总线复位
-    Suspended --> Default: USB总线复位
-    
-    %% 断开路径
-    Configured --> Detached: 物理断开
-    Suspended --> Detached: 物理断开
+    Configured --> Detached: 断开连接
+    Suspended --> Detached: 断开连接
     Address --> Detached: 严重错误
     Default --> Detached: 连接失败
     Attached --> Detached: 供电失败
-    
-    note right of Default
-        默认状态特点:
-        - 地址为0
-        - 只有端点0可用
-        - 只能响应控制传输
-        - 用于设备枚举
-    end note
-    
-    note right of Configured  
-        配置状态特点:
-        - 所有端点激活
-        - 功能完全可用
-        - 可处理所有传输类型
-        - 正常工作状态
-    end note
 ```
 
 ### 4.2 端点状态管理架构

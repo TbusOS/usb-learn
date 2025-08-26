@@ -55,9 +55,7 @@ graph TB
         J4[设备状态机]
     end
     
-    style F fill:#e1f5fe
-    style G fill:#fff3e0
-    style J fill:#f3e5f5
+
 ```
 
 ### 1.2 Linux USB子系统架构
@@ -125,10 +123,7 @@ graph TD
     E3 --> F
     E4 --> F
     
-    style D1 fill:#e8f5e8
-    style D2 fill:#e8f5e8  
-    style D3 fill:#e8f5e8
-    style E2 fill:#fff3e0
+
 ```
 
 ## 2. USB设备枚举流程
@@ -303,10 +298,7 @@ graph TD
         J2 --> K2[read()返回]
     end
     
-    style C1 fill:#e1f5fe
-    style C2 fill:#e1f5fe
-    style I1 fill:#e8f5e8
-    style I2 fill:#e8f5e8
+
 ```
 
 ### 3.3 中断传输调度示意
@@ -453,9 +445,7 @@ flowchart TD
     R --> S[驱动处理完成事件]
     S --> T[释放URB资源]
     
-    style C fill:#e1f5fe
-    style G fill:#fff3e0
-    style R fill:#e8f5e8
+
 ```
 
 ## 5. USB Hub工作原理
@@ -509,9 +499,7 @@ graph TB
     P3 <--> DEV3
     P4 <--> DEV4
     
-    style HC fill:#e1f5fe
-    style PM fill:#fff3e0
-    style UPC fill:#f3e5f5
+
 ```
 
 ### 5.2 Hub事务处理流程
@@ -629,10 +617,7 @@ flowchart TD
     L --> D1
     M --> N[应用层错误处理]
     
-    style B fill:#fff3e0
-    style I fill:#e1f5fe  
-    style J fill:#e8f5e8
-    style M fill:#ffebee
+
 ```
 
 ### 6.2 多层错误处理协作
@@ -682,10 +667,7 @@ graph TB
     C1 -->|端点清理| C3
     C2 -->|硬件复位| D3
     
-    style C1 fill:#fff3e0
-    style C2 fill:#e1f5fe
-    style B1 fill:#f3e5f5
-    style A1 fill:#ffebee
+
 ```
 
 ## 7. USB性能优化架构
@@ -729,10 +711,7 @@ graph TD
     C1 --> ALG3  
     B1 --> ALG4
     
-    style S1 fill:#ffebee
-    style I1 fill:#fff3e0
-    style C1 fill:#e1f5fe
-    style B1 fill:#e8f5e8
+
 ```
 
 ### 7.2 多URB队列优化架构
@@ -783,9 +762,7 @@ graph LR
     C2 --> OPT4
     C2 --> OPT5
     
-    style D1 fill:#e1f5fe
-    style C2 fill:#fff3e0
-    style OPT2 fill:#e8f5e8
+
 ```
 
 ### 7.3 USB 3.0+ 架构优势
@@ -818,9 +795,7 @@ graph TB
     U3_EFFI --> PERF
     U3_COMPAT --> PERF
     
-    style U2_BUS fill:#ffebee
-    style U3_BUS fill:#e8f5e8
-    style PERF fill:#fff3e0
+
 ```
 
 ## 8. USB调试接口架构
@@ -869,9 +844,7 @@ graph TB
     K2 --> CORE
     K3 --> CORE
     
-    style T2 fill:#fff3e0
-    style K2 fill:#e1f5fe
-    style CORE fill:#e8f5e8
+
 ```
 
 ### 8.2 调试数据流向图
@@ -904,9 +877,7 @@ flowchart TD
         J1 --> K4[性能调优]
     end
     
-    style D fill:#fff3e0
-    style H1 fill:#e1f5fe
-    style K2 fill:#e8f5e8
+
 ```
 
 ## 总结
